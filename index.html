@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>SmoovPlay: 30 fps vs 60 and 90 fps</title>
+<meta name="description" content="A 30 fps PS5 Remote Play stream next to SmoovPlay's 60 and 90 fps output, played at full frame rate.">
+<meta property="og:title" content="SmoovPlay: 30 fps vs 60 and 90 fps">
+<meta property="og:description" content="Side-by-side comparison at full frame rate. Reddit and most social sites play video at 60 fps or less; this page doesn't.">
+<meta property="og:image" content="https://smoovplay.github.io/compare/media/poster90.jpg">
+<meta name="theme-color" content="#0b0d11">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@100..125,500..800&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@500;600&display=swap">
+<style>
+/* One screening column: the comparison player (60 / 90 fps) first, then the slowed clip, then what SmoovPlay is.
+   A committed dark look, the trailer's own: blue-black ground, amber for SmoovPlay. */
+:root{
+  --bg:#0b0d11; --panel:#12151b; --line:#232934; --fg:#f3f5f9; --fg2:#a9b1bf; --muted:#6f788a;
+  --amber:#ffb02e; --ink:#1a1206;
+  --display:"Archivo","Segoe UI",system-ui,sans-serif;
+  --body:"Instrument Sans","Segoe UI",system-ui,sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,Consolas,monospace;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+body{margin:0;background:var(--bg);color:var(--fg);font:400 16px/1.55 var(--body);-webkit-font-smoothing:antialiased}
+.wrap{max-width:1120px;margin:0 auto;padding-block:28px 64px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:grid;gap:32px}
+header{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px 20px}
+.brand{display:flex;align-items:center;gap:10px;font:700 18px/1 var(--display);font-stretch:112%;color:var(--fg);text-decoration:none}
+.brand img{width:32px;height:32px;display:block}
+.get{display:inline-flex;align-items:center;gap:8px;padding:10px 16px;border-radius:999px;background:var(--amber);color:var(--ink);font:700 15px/1 var(--display);font-stretch:108%;text-decoration:none}
+.get:hover{filter:brightness(1.06)}
+.intro{display:grid;gap:10px}
+.eyebrow{font:600 12px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--amber)}
+h1{margin:0;font:800 clamp(30px,5.4vw,56px)/1.02 var(--display);font-stretch:118%;letter-spacing:-.01em;text-wrap:balance}
+.lede{margin:0;color:var(--fg2);font-size:18px;max-width:64ch}
+.player{display:grid;gap:12px}
+.bar{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px 16px}
+.seg{display:inline-flex;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:4px}
+.seg button{all:unset;cursor:pointer;padding:9px 16px;border-radius:9px;font:600 14px/1 var(--mono);color:var(--fg2)}
+.seg button[aria-pressed="true"]{background:var(--amber);color:var(--ink)}
+.seg button:focus-visible{outline:2px solid var(--fg);outline-offset:2px}
+.hz{font:500 13px/1.4 var(--mono);color:var(--fg2);min-width:0}
+.hz b{color:var(--fg);font-weight:600}
+.screen{position:relative;aspect-ratio:16/9;max-width:100%;border-radius:14px;overflow:hidden;background:#000;border:1px solid var(--line)}
+.screen video{position:absolute;inset:0;width:100%;height:100%;display:block;background:#000}
+.tips{margin:0;padding:0;list-style:none;display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+.tips li{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 16px;color:var(--fg2);font-size:15px}
+.tips b{display:block;color:var(--fg);font-weight:600;margin-bottom:2px}
+section{display:grid;gap:12px;min-width:0}
+h2{margin:0;font:750 clamp(22px,3vw,30px)/1.15 var(--display);font-stretch:108%;text-wrap:balance}
+section > p{margin:0;color:var(--fg2);max-width:70ch}
+.about{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:20px;align-items:start;background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:22px 24px}
+@media (max-width:760px){.about{grid-template-columns:minmax(0,1fr)}}
+.about p{margin:0;color:var(--fg2)}
+.about p + p{margin-top:10px}
+.about strong{color:var(--fg)}
+.specs{display:flex;flex-wrap:wrap;gap:6px;font:500 12px/1 var(--mono);color:var(--fg2);align-content:start}
+.specs span{padding:7px 10px;border:1px solid var(--line);border-radius:999px;white-space:nowrap}
+.specs .on{color:var(--ink);background:var(--amber);border-color:var(--amber)}
+a{color:var(--amber);text-underline-offset:3px}
+footer{color:var(--muted);font-size:13px;line-height:1.5;max-width:90ch;display:grid;gap:6px}
+footer p{margin:0}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <a class="brand" href="https://github.com/smoovplay/smoovplay"><img src="icon.svg" alt="">SmoovPlay</a>
+    <a class="get" href="https://github.com/smoovplay/smoovplay">Get SmoovPlay on GitHub</a>
+  </header>
+
+  <div class="intro">
+    <div class="eyebrow">Side by side · full frame rate</div>
+    <h1>30 fps Remote Play vs SmoovPlay</h1>
+    <p class="lede">Reddit and most social sites play video at 60 fps or less, which hides the difference. Your browser plays these files at their real frame rate.</p>
+  </div>
+
+  <div class="player">
+    <div class="bar">
+      <div class="seg" role="group" aria-label="Frame rate">
+        <button type="button" data-fps="60" aria-pressed="false">60 fps</button>
+        <button type="button" data-fps="90" aria-pressed="false">90 fps</button>
+      </div>
+      <div class="hz" id="hz" aria-live="polite">Checking your screen…</div>
+    </div>
+    <div class="screen">
+      <video id="v" muted loop playsinline controls preload="metadata" poster="media/poster90.jpg" aria-label="Side-by-side comparison: the 30 fps stream on the left, SmoovPlay on the right"></video>
+    </div>
+    <ul class="tips">
+      <li><b>Left of the line</b>The PS5's 30 fps Remote Play stream, as it arrives on the PC.</li>
+      <li><b>Right of the line</b>SmoovPlay: AI-drawn frames in between the real ones, upscaled to the screen.</li>
+      <li><b>Where to look</b>Go fullscreen and watch edges and street lights as the camera turns.</li>
+    </ul>
+  </div>
+
+  <section aria-labelledby="slow-h">
+    <h2 id="slow-h">Every frame, slowed 3×</h2>
+    <p>Works on any screen. This is the 90 fps mode played at a third of the speed: each real frame from the PS5 is followed by two drawn by the AI.</p>
+    <div class="screen">
+      <video muted loop playsinline controls preload="metadata" poster="media/poster_slow.jpg" src="media/smoovplay_every_frame_slowed_3x_1080p30.mp4" aria-label="Every frame of the 90 fps output, slowed three times"></video>
+    </div>
+  </section>
+
+  <div class="about">
+    <div>
+      <p><strong>SmoovPlay</strong> plays your console on your PC and uses the graphics card to draw extra frames, so a 30 fps game runs at 60, 90 or up to 120 fps to match your screen.</p>
+      <p>Free and open source for Windows 10 and 11: <a href="https://github.com/smoovplay/smoovplay">github.com/smoovplay/smoovplay</a></p>
+    </div>
+    <div class="specs" aria-label="In these clips"><span>1080p30 stream in</span><span class="on">60 or 90 fps out</span><span>RIFE 4.22 lite</span><span>AMD FSR 1</span></div>
+  </div>
+
+  <footer>
+    <p>Clips: Rockstar Games' published GTA VI gameplay (An Extended Look), run through SmoovPlay as a simulated 1080p30 PS5 Remote Play stream. Demonstration only; nothing here is monetized. Grand Theft Auto VI © Rockstar Games.</p>
+    <p>SmoovPlay is an independent project, not affiliated with or endorsed by Rockstar Games, Sony, Microsoft, NVIDIA, AMD or Intel.</p>
+  </footer>
+</div>
+
+<script>
+// The 90 fps file only looks right on a 90 Hz or faster screen, so pick by the refresh rate measured from
+// animation frames (median interval over ~1 s). The viewer can always switch.
+const v = document.getElementById('v'), hz = document.getElementById('hz');
+const btns = [...document.querySelectorAll('.seg button')];
+const SRC = {60: 'media/smoovplay_side_by_side_1080p60.mp4', 90: 'media/smoovplay_side_by_side_1080p90.mp4'};
+const POSTER = {60: 'media/poster60.jpg', 90: 'media/poster90.jpg'};
+let fps = 0, measured = 0;
+function pick(f, keepTime){
+  if (f === fps) return;
+  const t = keepTime ? v.currentTime : 0, playing = keepTime && !v.paused;
+  fps = f;
+  btns.forEach(b => b.setAttribute('aria-pressed', String(+b.dataset.fps === f)));
+  v.poster = POSTER[f]; v.src = SRC[f];
+  if (t) v.addEventListener('loadedmetadata', () => { v.currentTime = t; }, {once: true});  // both clips share one timeline
+  if (playing) v.play().catch(() => {});
+  note();
+}
+function note(){
+  if (!measured) return;
+  const h = Math.round(measured);
+  hz.innerHTML = h >= 85
+    ? `Your screen runs at about <b>${h} Hz</b>${fps === 90 ? ', so you see all 90 frames a second.' : '. Try 90 fps.'}`
+    : `Your screen runs at about <b>${h} Hz</b>${fps === 90 ? ': 90 fps needs a 90 Hz or faster screen, so 60 fps will look the same here.' : '. 90 fps needs a 90 Hz or faster screen.'}`;
+}
+btns.forEach(b => b.addEventListener('click', () => pick(+b.dataset.fps, true)));
+function measure(){
+  const ts = [];
+  function step(t){
+    ts.push(t);
+    if (ts.length < 70) return requestAnimationFrame(step);
+    const d = ts.slice(1).map((x, i) => x - ts[i]).sort((a, b) => a - b);
+    const med = d[d.length >> 1];
+    measured = med > 0 ? 1000 / med : 60;
+    if (!fps) pick(measured >= 85 ? 90 : 60, false); else note();
+  }
+  requestAnimationFrame(step);
+}
+if (document.visibilityState === 'visible') measure();
+else document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && !measured) measure(); }, {once: true});
+setTimeout(() => { if (!fps) { pick(60, false); hz.textContent = '90 fps needs a 90 Hz or faster screen.'; } }, 3000);
+</script>
+</body>
+</html>
