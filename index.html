@@ -53,6 +53,12 @@ h1{margin:0;font:800 clamp(30px,5.4vw,56px)/1.02 var(--display);font-stretch:118
 section{display:grid;gap:12px;min-width:0}
 h2{margin:0;font:750 clamp(22px,3vw,30px)/1.15 var(--display);font-stretch:108%;text-wrap:balance}
 section > p{margin:0;color:var(--fg2);max-width:70ch}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
+@media (max-width:760px){.grid{grid-template-columns:minmax(0,1fr)}}
+.clip{display:grid;gap:10px;min-width:0}
+.clip .screen{border-radius:12px}
+.clip h3{margin:0;font:700 17px/1.25 var(--display);font-stretch:106%}
+.clip p{margin:0;color:var(--fg2);font-size:15px}
 .about{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:20px;align-items:start;background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:22px 24px}
 @media (max-width:760px){.about{grid-template-columns:minmax(0,1fr)}}
 .about p{margin:0;color:var(--fg2)}
@@ -98,6 +104,12 @@ footer p{margin:0}
     </ul>
   </div>
 
+  <section aria-labelledby="more-h">
+    <h2 id="more-h">More clips</h2>
+    <p>Five more shots from the trailer, the same way round: the 30 fps stream left of the line, SmoovPlay right of it. They follow the 60 / 90 fps switch above.</p>
+    <div class="grid" id="gallery"></div>
+  </section>
+
   <section aria-labelledby="slow-h">
     <h2 id="slow-h">Every frame, slowed 3×</h2>
     <p>Works on any screen. This is the 90 fps mode played at a third of the speed: each real frame from the PS5 is followed by two drawn by the AI.</p>
@@ -127,15 +139,33 @@ const v = document.getElementById('v'), hz = document.getElementById('hz');
 const btns = [...document.querySelectorAll('.seg button')];
 const SRC = {60: 'media/smoovplay_side_by_side_1080p60.mp4', 90: 'media/smoovplay_side_by_side_1080p90.mp4'};
 const POSTER = {60: 'media/poster60.jpg', 90: 'media/poster90.jpg'};
+const CLIPS = [
+  ['masks', 'Masks on', 'Masks go on outside the diner.'],
+  ['bike', 'Bike ride', 'Two up on a motorbike through town.'],
+  ['downtown', 'Downtown drive', 'Over the causeway as a helicopter crosses.'],
+  ['runway', 'Night runway', 'A chase across a wet runway, city lights behind.'],
+  ['hideout', 'Hideout firefight', 'Trading shots in a dark office.'],
+];
+document.getElementById('gallery').innerHTML = CLIPS.map(([slug, name, what]) => `
+  <article class="clip">
+    <div class="screen"><video data-slug="${slug}" muted loop playsinline controls preload="none" poster="media/clip_${slug}_60.jpg" aria-label="${name}: the 30 fps stream on the left, SmoovPlay on the right"></video></div>
+    <h3>${name}</h3>
+    <p>${what}</p>
+  </article>`).join('');
+const gallery = [...document.querySelectorAll('#gallery video')];
 let fps = 0, measured = 0;
+function swap(el, src, keepTime){  // same shot at the other frame rate: both share one timeline
+  const t = keepTime ? el.currentTime : 0, playing = keepTime && !el.paused;
+  el.src = src;
+  if (t) el.addEventListener('loadedmetadata', () => { el.currentTime = t; }, {once: true});
+  if (playing) el.play().catch(() => {});
+}
 function pick(f, keepTime){
   if (f === fps) return;
-  const t = keepTime ? v.currentTime : 0, playing = keepTime && !v.paused;
   fps = f;
   btns.forEach(b => b.setAttribute('aria-pressed', String(+b.dataset.fps === f)));
-  v.poster = POSTER[f]; v.src = SRC[f];
-  if (t) v.addEventListener('loadedmetadata', () => { v.currentTime = t; }, {once: true});  // both clips share one timeline
-  if (playing) v.play().catch(() => {});
+  v.poster = POSTER[f]; swap(v, SRC[f], keepTime);
+  gallery.forEach(g => { g.poster = `media/clip_${g.dataset.slug}_${f}.jpg`; swap(g, `media/clip_${g.dataset.slug}_${f}.mp4`, keepTime); });
   note();
 }
 function note(){
