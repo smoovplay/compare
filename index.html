@@ -4,9 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>SmoovPlay: 30 fps vs 60 and 90 fps</title>
-<meta name="description" content="A 30 fps PS5 Remote Play stream next to SmoovPlay's 60 and 90 fps output, played at full frame rate.">
+<meta name="description" content="Six clips of a 30 fps PS5 Remote Play stream against SmoovPlay's 60 and 90 fps output, at full frame rate: split, side by side, or flip between them.">
 <meta property="og:title" content="SmoovPlay: 30 fps vs 60 and 90 fps">
-<meta property="og:description" content="Side-by-side comparison at full frame rate. Reddit and most social sites play video at 60 fps or less; this page doesn't.">
+<meta property="og:description" content="Six clips at full frame rate: split, side by side, or flip between the 30 fps stream and SmoovPlay. Reddit and most social sites play video at 60 fps or less; this page doesn't.">
 <meta property="og:image" content="https://smoovplay.github.io/compare/media/poster90.jpg">
 <meta name="theme-color" content="#0b0d11">
 <link rel="icon" href="icon.svg" type="image/svg+xml">
@@ -14,8 +14,8 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@100..125,500..800&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@500;600&display=swap">
 <style>
-/* One screening column: the comparison player (60 / 90 fps) first, then the slowed clip, then what SmoovPlay is.
-   A committed dark look, the trailer's own: blue-black ground, amber for SmoovPlay. */
+/* One screening column: the player (six clips, four views, 60 / 90 fps) with its clip gallery, then the slowed clip,
+   then what SmoovPlay is. A committed dark look, the trailer's own: blue-black ground, amber for SmoovPlay. */
 :root{
   --bg:#0b0d11; --panel:#12151b; --line:#232934; --fg:#f3f5f9; --fg2:#a9b1bf; --muted:#6f788a;
   --amber:#ffb02e; --ink:#1a1206;
@@ -25,6 +25,7 @@
   color-scheme:dark;
 }
 *{box-sizing:border-box}
+[hidden]{display:none!important}
 html{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 body{margin:0;background:var(--bg);color:var(--fg);font:400 16px/1.55 var(--body);-webkit-font-smoothing:antialiased}
 .wrap{max-width:1120px;margin:0 auto;padding-block:28px 64px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:grid;gap:32px}
@@ -34,31 +35,80 @@ header{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-betw
 .get{display:inline-flex;align-items:center;gap:8px;padding:10px 16px;border-radius:999px;background:var(--amber);color:var(--ink);font:700 15px/1 var(--display);font-stretch:108%;text-decoration:none}
 .get:hover{filter:brightness(1.06)}
 .intro{display:grid;gap:10px}
-.eyebrow{font:600 12px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--amber)}
+.eyebrow,.lbl{font:600 12px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--amber)}
+.lbl{font-size:11px;letter-spacing:.12em;color:var(--muted)}
 h1{margin:0;font:800 clamp(30px,5.4vw,56px)/1.02 var(--display);font-stretch:118%;letter-spacing:-.01em;text-wrap:balance}
 .lede{margin:0;color:var(--fg2);font-size:18px;max-width:64ch}
-.player{display:grid;gap:12px}
-.bar{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px 16px}
-.seg{display:inline-flex;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:4px}
-.seg button{all:unset;cursor:pointer;padding:9px 16px;border-radius:9px;font:600 14px/1 var(--mono);color:var(--fg2)}
+
+/* The player */
+.player{display:grid;gap:14px}
+.theater{display:grid;gap:10px}
+.stage{position:relative;aspect-ratio:16/9;max-width:100%;border-radius:14px;overflow:hidden;background:#000;border:1px solid var(--line);cursor:pointer}
+.stage[data-view="side"]{aspect-ratio:32/9}
+.pane{position:absolute;inset:0;opacity:0;pointer-events:none}
+.pane.on{opacity:1}
+.pane video{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#000;display:block}
+.stage[data-view="side"] .pane-base{right:calc(50% + 2px)}
+.stage[data-view="side"] .pane-smooth{left:calc(50% + 2px)}
+@media (max-width:640px){
+  .stage[data-view="side"]{aspect-ratio:16/18}
+  .stage[data-view="side"] .pane-base{right:0;bottom:calc(50% + 2px)}
+  .stage[data-view="side"] .pane-smooth{left:0;top:calc(50% + 2px)}
+}
+.tag{position:absolute;left:12px;top:12px;padding:6px 10px;border-radius:999px;font:600 12px/1 var(--mono);background:rgba(14,16,20,.8);color:var(--fg);white-space:nowrap}
+.tag.sp{background:var(--amber);color:var(--ink)}
+.big{all:unset;position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:76px;height:76px;border-radius:50%;background:var(--amber);color:var(--ink);display:grid;place-items:center;cursor:pointer;box-shadow:0 6px 30px rgba(0,0,0,.45)}
+.big svg{width:30px;height:30px;margin-left:5px}
+.big:focus-visible{outline:2px solid var(--fg);outline-offset:3px}
+.controls{display:flex;align-items:center;gap:10px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:6px 10px}
+.icon{all:unset;cursor:pointer;width:36px;height:36px;flex:none;display:grid;place-items:center;border-radius:8px;color:var(--fg)}
+.icon:hover{background:var(--line)}
+.icon:focus-visible{outline:2px solid var(--fg)}
+.icon svg{width:20px;height:20px}
+.time{font:500 13px/1 var(--mono);color:var(--fg2);white-space:nowrap;font-variant-numeric:tabular-nums}
+.seek{flex:1;min-width:0;accent-color:var(--amber);cursor:pointer}
+.switches{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px 18px}
+.ctl{display:flex;flex-wrap:wrap;align-items:center;gap:8px 10px;min-width:0}
+.seg{display:inline-flex;flex-wrap:wrap;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:4px;gap:2px}
+.seg button{all:unset;cursor:pointer;padding:9px 14px;border-radius:9px;font:600 14px/1 var(--mono);color:var(--fg2);white-space:nowrap}
+.seg button:hover{color:var(--fg)}
 .seg button[aria-pressed="true"]{background:var(--amber);color:var(--ink)}
 .seg button:focus-visible{outline:2px solid var(--fg);outline-offset:2px}
-.hz{font:500 13px/1.4 var(--mono);color:var(--fg2);min-width:0}
+.hz{margin:0;font:500 13px/1.4 var(--mono);color:var(--fg2);min-width:0}
 .hz b{color:var(--fg);font-weight:600}
-.screen{position:relative;aspect-ratio:16/9;max-width:100%;border-radius:14px;overflow:hidden;background:#000;border:1px solid var(--line)}
-.screen video{position:absolute;inset:0;width:100%;height:100%;display:block;background:#000}
-.tips{margin:0;padding:0;list-style:none;display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+.theater:fullscreen{background:#000;display:flex;flex-direction:column;gap:8px;padding:10px;width:100%;height:100%}
+.theater:fullscreen .stage{flex:1 1 auto;min-height:0;aspect-ratio:auto;border:0;border-radius:0}
+.theater:-webkit-full-screen{background:#000;display:flex;flex-direction:column;gap:8px;padding:10px;width:100%;height:100%}
+.theater:-webkit-full-screen .stage{flex:1 1 auto;min-height:0;aspect-ratio:auto;border:0;border-radius:0}
+
+/* Now playing + the clip gallery */
+.now{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 14px}
+.now h2{margin:0;font:750 clamp(20px,2.6vw,26px)/1.15 var(--display);font-stretch:108%}
+.now p{margin:0;color:var(--fg2)}
+.clips{display:grid;gap:10px}
+.reel{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:12px}
+@media (max-width:900px){.reel{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media (max-width:520px){.reel{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.thumb{all:unset;cursor:pointer;display:grid;gap:7px;min-width:0}
+.thumb .img{position:relative;aspect-ratio:16/9;border-radius:10px;overflow:hidden;border:2px solid var(--line);background:#000}
+.thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.thumb .len{position:absolute;right:6px;bottom:6px;padding:3px 6px;border-radius:6px;background:rgba(14,16,20,.82);font:600 11px/1 var(--mono);color:var(--fg)}
+.thumb .playing{position:absolute;left:6px;top:6px;padding:3px 7px;border-radius:6px;background:var(--amber);color:var(--ink);font:700 10px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase}
+.thumb .name{font:650 14px/1.25 var(--display);font-stretch:106%;color:var(--fg2)}
+.thumb:hover .img{border-color:var(--fg2)}
+.thumb[aria-pressed="true"] .img{border-color:var(--amber)}
+.thumb[aria-pressed="true"] .name{color:var(--fg)}
+.thumb:focus-visible .img{outline:2px solid var(--fg);outline-offset:2px}
+
+.tips{margin:0;padding:0;list-style:none;display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px}
 .tips li{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 16px;color:var(--fg2);font-size:15px}
 .tips b{display:block;color:var(--fg);font-weight:600;margin-bottom:2px}
+kbd{font:600 12px/1 var(--mono);padding:2px 6px;border:1px solid var(--line);border-radius:5px;color:var(--fg)}
 section{display:grid;gap:12px;min-width:0}
-h2{margin:0;font:750 clamp(22px,3vw,30px)/1.15 var(--display);font-stretch:108%;text-wrap:balance}
+section h2{margin:0;font:750 clamp(22px,3vw,30px)/1.15 var(--display);font-stretch:108%;text-wrap:balance}
 section > p{margin:0;color:var(--fg2);max-width:70ch}
-.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
-@media (max-width:760px){.grid{grid-template-columns:minmax(0,1fr)}}
-.clip{display:grid;gap:10px;min-width:0}
-.clip .screen{border-radius:12px}
-.clip h3{margin:0;font:700 17px/1.25 var(--display);font-stretch:106%}
-.clip p{margin:0;color:var(--fg2);font-size:15px}
+.screen{position:relative;aspect-ratio:16/9;max-width:100%;border-radius:14px;overflow:hidden;background:#000;border:1px solid var(--line)}
+.screen video{position:absolute;inset:0;width:100%;height:100%;display:block;background:#000}
 .about{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:20px;align-items:start;background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:22px 24px}
 @media (max-width:760px){.about{grid-template-columns:minmax(0,1fr)}}
 .about p{margin:0;color:var(--fg2)}
@@ -81,34 +131,66 @@ footer p{margin:0}
   </header>
 
   <div class="intro">
-    <div class="eyebrow">Side by side · full frame rate</div>
+    <div class="eyebrow">Six clips · full frame rate</div>
     <h1>30 fps Remote Play vs SmoovPlay</h1>
-    <p class="lede">Reddit and most social sites play video at 60 fps or less, which hides the difference. Your browser plays these files at their real frame rate.</p>
+    <p class="lede">Reddit and most social sites play video at 60 fps or less, which hides the difference. Your browser plays these at their real frame rate. Split them, put them side by side, or flip between the two.</p>
   </div>
 
   <div class="player">
-    <div class="bar">
-      <div class="seg" role="group" aria-label="Frame rate">
-        <button type="button" data-fps="60" aria-pressed="false">60 fps</button>
-        <button type="button" data-fps="90" aria-pressed="false">90 fps</button>
+    <div class="theater" id="theater">
+      <div class="stage" id="stage" data-view="split">
+        <div class="pane pane-split on" id="pSplit">
+          <video id="vSplit" muted loop playsinline preload="none" poster="media/poster60.jpg" aria-label="Split view: the 30 fps stream left of the line, SmoovPlay right of it"></video>
+        </div>
+        <div class="pane pane-base" id="pBase">
+          <video id="vBase" muted playsinline preload="none" aria-label="The 30 fps PS5 Remote Play stream"></video>
+          <span class="tag">PS5 Remote Play · 30 fps</span>
+        </div>
+        <div class="pane pane-smooth" id="pSmooth">
+          <video id="vSmooth" muted playsinline preload="none" aria-label="SmoovPlay's output"></video>
+          <span class="tag sp" id="spTag">SmoovPlay · 60 fps</span>
+        </div>
+        <button type="button" class="big" id="big" aria-label="Play"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M7 4.5v15l12.5-7.5z"/></svg></button>
       </div>
-      <div class="hz" id="hz" aria-live="polite">Checking your screen…</div>
+      <div class="controls">
+        <button type="button" class="icon" id="play" aria-label="Play"></button>
+        <span class="time" id="time">0:00 / 0:16</span>
+        <input class="seek" id="seek" type="range" min="0" max="1000" value="0" step="1" aria-label="Position in the clip">
+        <button type="button" class="icon" id="fs" aria-label="Fullscreen"></button>
+      </div>
+      <div class="switches">
+        <div class="ctl">
+          <span class="lbl">View</span>
+          <div class="seg" id="viewSeg" role="group" aria-label="View">
+            <button type="button" data-view="split" aria-pressed="true">Split</button>
+            <button type="button" data-view="side" aria-pressed="false">Side by side</button>
+            <button type="button" data-view="base" aria-pressed="false">30 fps</button>
+            <button type="button" data-view="smooth" aria-pressed="false">SmoovPlay</button>
+          </div>
+        </div>
+        <div class="ctl">
+          <span class="lbl">SmoovPlay at</span>
+          <div class="seg" id="fpsSeg" role="group" aria-label="SmoovPlay frame rate">
+            <button type="button" data-fps="60" aria-pressed="false">60 fps</button>
+            <button type="button" data-fps="90" aria-pressed="false">90 fps</button>
+          </div>
+        </div>
+      </div>
     </div>
-    <div class="screen">
-      <video id="v" muted loop playsinline controls preload="metadata" poster="media/poster90.jpg" aria-label="Side-by-side comparison: the 30 fps stream on the left, SmoovPlay on the right"></video>
+    <p class="hz" id="hz" aria-live="polite">Checking your screen…</p>
+
+    <div class="clips">
+      <div class="now"><h2 id="nowName">Drive and chase</h2><p id="nowText"></p></div>
+      <div class="reel" id="reel" role="group" aria-label="Clips"></div>
     </div>
+
     <ul class="tips">
-      <li><b>Left of the line</b>The PS5's 30 fps Remote Play stream, as it arrives on the PC.</li>
-      <li><b>Right of the line</b>SmoovPlay: AI-drawn frames in between the real ones, upscaled to the screen.</li>
-      <li><b>Where to look</b>Go fullscreen and watch edges and street lights as the camera turns.</li>
+      <li><b>Split</b>The 30 fps stream left of the line, SmoovPlay right of it.</li>
+      <li><b>Side by side</b>Both whole pictures next to each other, playing in step.</li>
+      <li><b>Flip</b>Pick 30 fps or SmoovPlay and switch back and forth (or press <kbd>T</kbd>): both stay on the same moment.</li>
+      <li><b>Where to look</b>Go fullscreen (<kbd>F</kbd>) and watch edges and street lights as the camera turns.</li>
     </ul>
   </div>
-
-  <section aria-labelledby="more-h">
-    <h2 id="more-h">More clips</h2>
-    <p>Five more shots from the trailer, the same way round: the 30 fps stream left of the line, SmoovPlay right of it. They follow the 60 / 90 fps switch above.</p>
-    <div class="grid" id="gallery"></div>
-  </section>
 
   <section aria-labelledby="slow-h">
     <h2 id="slow-h">Every frame, slowed 3×</h2>
@@ -133,41 +215,202 @@ footer p{margin:0}
 </div>
 
 <script>
-// The 90 fps file only looks right on a 90 Hz or faster screen, so pick by the refresh rate measured from
-// animation frames (median interval over ~1 s). The viewer can always switch.
-const v = document.getElementById('v'), hz = document.getElementById('hz');
-const btns = [...document.querySelectorAll('.seg button')];
-const SRC = {60: 'media/smoovplay_side_by_side_1080p60.mp4', 90: 'media/smoovplay_side_by_side_1080p90.mp4'};
-const POSTER = {60: 'media/poster60.jpg', 90: 'media/poster90.jpg'};
+// One player, six clips, four views. Split plays the pre-rendered split clip. The other three views play two
+// full-frame files in step: the 30 fps stream (vBase) follows SmoovPlay's output (vSmooth), so flipping between them
+// is instant and lands on the same moment. SmoovPlay's frame rate (60 or 90) is picked from the screen's refresh rate.
 const CLIPS = [
-  ['masks', 'Masks on', 'Masks go on outside the diner.'],
-  ['bike', 'Bike ride', 'Two up on a motorbike through town.'],
-  ['downtown', 'Downtown drive', 'Over the causeway as a helicopter crosses.'],
-  ['runway', 'Night runway', 'A chase across a wet runway, city lights behind.'],
-  ['hideout', 'Hideout firefight', 'Trading shots in a dark office.'],
+  {slug: 'main', name: 'Drive and chase', dur: 16.0, text: 'A sunset highway drive, a getaway down an alley, then a police helicopter overhead.'},
+  {slug: 'masks', name: 'Masks on', dur: 7.8, text: 'Masks go on outside the diner.'},
+  {slug: 'bike', name: 'Bike ride', dur: 8.0, text: 'Two up on a motorbike through town.'},
+  {slug: 'downtown', name: 'Downtown drive', dur: 9.2, text: 'Over the causeway as a helicopter crosses.'},
+  {slug: 'runway', name: 'Night runway', dur: 6.3, text: 'A chase across a wet runway, city lights behind.'},
+  {slug: 'hideout', name: 'Hideout firefight', dur: 9.4, text: 'Trading shots in a dark office.'},
 ];
-document.getElementById('gallery').innerHTML = CLIPS.map(([slug, name, what]) => `
-  <article class="clip">
-    <div class="screen"><video data-slug="${slug}" muted loop playsinline controls preload="none" poster="media/clip_${slug}_60.jpg" aria-label="${name}: the 30 fps stream on the left, SmoovPlay on the right"></video></div>
-    <h3>${name}</h3>
-    <p>${what}</p>
-  </article>`).join('');
-const gallery = [...document.querySelectorAll('#gallery video')];
-let fps = 0, measured = 0;
-function swap(el, src, keepTime){  // same shot at the other frame rate: both share one timeline
-  const t = keepTime ? el.currentTime : 0, playing = keepTime && !el.paused;
-  el.src = src;
-  if (t) el.addEventListener('loadedmetadata', () => { el.currentTime = t; }, {once: true});
-  if (playing) el.play().catch(() => {});
+const $ = id => document.getElementById(id);
+const stage = $('stage'), theater = $('theater'), hz = $('hz');
+const vSplit = $('vSplit'), vBase = $('vBase'), vSmooth = $('vSmooth'), ALL = [vSplit, vBase, vSmooth];
+const viewBtns = [...$('viewSeg').querySelectorAll('button')], fpsBtns = [...$('fpsSeg').querySelectorAll('button')];
+const playBtn = $('play'), big = $('big'), timeEl = $('time'), seek = $('seek'), fsBtn = $('fs');
+const ICON = {
+  play: '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M7 4.5v15l12.5-7.5z"/></svg>',
+  pause: '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M6.5 4.5h4v15h-4zM13.5 4.5h4v15h-4z"/></svg>',
+  full: '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2" d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5"/></svg>',
+  exit: '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2" d="M9 4v5H4M20 9h-5V4M15 20v-5h5M4 15h5v5"/></svg>',
+};
+let clip = CLIPS[0], fps = 0, view = 'split', measured = 0, started = false, gen = 0, curTime = 0, dragging = false;
+let want = false, busy = false;  // want: the viewer wants it playing; busy: a switch is loading
+
+const leader = () => view === 'split' ? vSplit : vSmooth;
+const active = () => view === 'split' ? [vSplit] : [vSmooth, vBase];
+const wanted = () => view === 'split'
+  ? [[vSplit, clip.slug === 'main' ? `media/smoovplay_side_by_side_1080p${fps}.mp4` : `media/clip_${clip.slug}_${fps}.mp4`]]
+  : [[vSmooth, `media/full_${clip.slug}_${fps}.mp4`], [vBase, `media/full_${clip.slug}_30.mp4`]];
+const fmt = s => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
+
+function posters(){
+  vSplit.poster = clip.slug === 'main' ? `media/poster${fps}.jpg` : `media/clip_${clip.slug}_${fps}.jpg`;
+  vBase.poster = vSmooth.poster = `media/full_${clip.slug}.jpg`;
 }
-function pick(f, keepTime){
+function showPanes(){
+  stage.dataset.view = view;
+  $('pSplit').classList.toggle('on', view === 'split');
+  $('pBase').classList.toggle('on', view === 'side' || view === 'base');
+  $('pSmooth').classList.toggle('on', view === 'side' || view === 'smooth');
+}
+// Point el at src, wait until it shows the frame at t (or give up after 5 s).
+function ready(el, src, t){
+  return new Promise(res => {
+    let fin = false;
+    const end = () => { if (!fin) { fin = true; clearTimeout(timer); res(); } };
+    const timer = setTimeout(end, 5000);
+    const go = () => {
+      if (Math.abs(el.currentTime - t) < 0.02 && el.readyState >= 2) return end();
+      el.addEventListener('seeked', end, {once: true});
+      el.currentTime = t;
+    };
+    el.preload = 'auto';
+    if (el.getAttribute('src') !== src) { el.addEventListener('loadedmetadata', go, {once: true}); el.src = src; }
+    else if (el.readyState >= 1) go();
+    else { el.addEventListener('loadedmetadata', go, {once: true}); el.load(); }
+  });
+}
+function playAll(){ want = true; active().forEach(el => { el.playbackRate = 1; el.play().catch(() => {}); }); }
+function pauseAll(){ want = false; active().forEach(el => el.pause()); }
+// Load what the current clip / view / frame rate needs at time t, then swap it in.
+async function apply({time, play} = {}){
+  if (!fps) setFps(60, true);
+  const my = ++gen, t = time ?? curTime, go = play ?? want, list = wanted();
+  curTime = t;
+  posters();
+  if (!started && !go) {  // nothing played yet: point at the files and show posters, load nothing big
+    for (const [el, src] of list) if (el.getAttribute('src') !== src) { el.preload = 'metadata'; el.src = src; }
+    showPanes(); ui(); return;
+  }
+  started = true; want = go; busy = true;
+  ui();
+  ALL.forEach(el => { if (!list.some(([e]) => e === el)) el.pause(); });
+  await Promise.all(list.map(([el, src]) => ready(el, src, t)));
+  if (my !== gen) return;
+  busy = false;
+  showPanes();
+  if (go) playAll(); else pauseAll();
+  ui();
+}
+function toggle(){
+  if (!started) return apply({play: true});
+  if (want) pauseAll(); else playAll();
+}
+function setView(v){
+  if (v === view) return;
+  const instant = view !== 'split' && v !== 'split' && (!started || (vBase.readyState >= 2 && vSmooth.readyState >= 2));
+  view = v;
+  viewBtns.forEach(b => b.setAttribute('aria-pressed', String(b.dataset.view === v)));
+  if (instant) { showPanes(); ui(); } else apply();
+}
+function setFps(f, quiet){
   if (f === fps) return;
   fps = f;
-  btns.forEach(b => b.setAttribute('aria-pressed', String(+b.dataset.fps === f)));
-  v.poster = POSTER[f]; swap(v, SRC[f], keepTime);
-  gallery.forEach(g => { g.poster = `media/clip_${g.dataset.slug}_${f}.jpg`; swap(g, `media/clip_${g.dataset.slug}_${f}.mp4`, keepTime); });
+  fpsBtns.forEach(b => b.setAttribute('aria-pressed', String(+b.dataset.fps === f)));
+  $('spTag').textContent = `SmoovPlay · ${f} fps`;
+  vSmooth.setAttribute('aria-label', `SmoovPlay's output at ${f} fps`);
   note();
+  if (!quiet) apply();
 }
+function setClip(c){
+  if (c === clip) return toggle();
+  clip = c;
+  document.querySelectorAll('.thumb').forEach(b => {
+    const on = b.dataset.slug === c.slug;
+    b.setAttribute('aria-pressed', String(on));
+    b.querySelector('.playing').hidden = !on;
+  });
+  $('nowName').textContent = c.name; $('nowText').textContent = c.text;
+  if (stage.getBoundingClientRect().top < 0) theater.scrollIntoView({behavior: 'smooth', block: 'start'});
+  apply({time: 0, play: true});
+}
+let shown = null;
+function ui(){
+  const L = leader(), dur = L.duration > 0 && isFinite(L.duration) ? L.duration : clip.dur, playing = started && want;
+  if (playing !== shown) {
+    shown = playing;
+    playBtn.innerHTML = playing ? ICON.pause : ICON.play;
+    playBtn.setAttribute('aria-label', playing ? 'Pause' : 'Play');
+    big.hidden = playing;
+  }
+  const txt = `${fmt(curTime)} / ${fmt(dur)}`;
+  if (timeEl.textContent !== txt) timeEl.textContent = txt;
+  if (!dragging) seek.value = String(Math.round(Math.min(curTime / dur, 1) * 1000));
+}
+// Keep the 30 fps stream in step with SmoovPlay: nudge its speed for small drift, jump for big drift.
+function tick(){
+  const L = leader();
+  if (started && !busy && L.readyState >= 1 && !L.seeking && !dragging) curTime = L.currentTime;
+  if (!busy && view !== 'split' && !vSmooth.paused && vBase.readyState >= 2) {
+    if (vBase.paused && !vBase.ended) vBase.play().catch(() => {});
+    const d = vBase.currentTime - vSmooth.currentTime;
+    if (Math.abs(d) > 0.25) { if (!vBase.seeking) vBase.currentTime = vSmooth.currentTime; }
+    else vBase.playbackRate = Math.abs(d) < 0.015 ? 1 : 1 - Math.max(-0.1, Math.min(0.1, d * 3));
+  }
+  ui();
+  requestAnimationFrame(tick);
+}
+vSmooth.addEventListener('ended', () => {  // loop both together
+  if (view === 'split') return;
+  [vSmooth, vBase].forEach(el => { el.currentTime = 0; el.play().catch(() => {}); });
+});
+ALL.forEach(el => ['play', 'pause'].forEach(e => el.addEventListener(e, ui)));
+
+seek.addEventListener('input', () => {
+  dragging = true;
+  const L = leader(), dur = L.duration > 0 && isFinite(L.duration) ? L.duration : clip.dur;
+  curTime = +seek.value / 1000 * dur;
+  if (started) active().forEach(el => { el.currentTime = curTime; });
+  ui();
+});
+seek.addEventListener('change', () => { dragging = false; });
+playBtn.addEventListener('click', toggle);
+big.addEventListener('click', e => { e.stopPropagation(); toggle(); });
+stage.addEventListener('click', toggle);
+viewBtns.forEach(b => b.addEventListener('click', () => setView(b.dataset.view)));
+fpsBtns.forEach(b => b.addEventListener('click', () => setFps(+b.dataset.fps)));
+
+function fullscreen(){
+  const d = document;
+  if (d.fullscreenElement || d.webkitFullscreenElement) return (d.exitFullscreen || d.webkitExitFullscreen).call(d);
+  const req = theater.requestFullscreen || theater.webkitRequestFullscreen;
+  const fallback = () => { const v = view === 'base' ? vBase : leader(); if (v.webkitEnterFullscreen) v.webkitEnterFullscreen(); };
+  if (!req) return fallback();
+  const r = req.call(theater);
+  if (r && r.catch) r.catch(fallback);
+}
+function fsIcon(){
+  const on = !!(document.fullscreenElement || document.webkitFullscreenElement);
+  fsBtn.innerHTML = on ? ICON.exit : ICON.full;
+  fsBtn.setAttribute('aria-label', on ? 'Exit fullscreen' : 'Fullscreen');
+}
+fsBtn.addEventListener('click', fullscreen);
+document.addEventListener('fullscreenchange', fsIcon);
+document.addEventListener('webkitfullscreenchange', fsIcon);
+document.addEventListener('keydown', e => {
+  if (e.ctrlKey || e.metaKey || e.altKey) return;
+  const k = e.key.toLowerCase(), inField = e.target.tagName === 'INPUT' && e.target.type !== 'range';
+  if (inField) return;
+  if (k === 't') { e.preventDefault(); setView(view === 'base' ? 'smooth' : 'base'); }
+  else if (k === 'f') { e.preventDefault(); fullscreen(); }
+  else if (k === 'k' || (k === ' ' && (e.target === document.body || e.target === stage))) { e.preventDefault(); toggle(); }
+});
+
+$('reel').innerHTML = CLIPS.map(c => `
+  <button type="button" class="thumb" data-slug="${c.slug}" aria-pressed="${c === clip}" aria-label="${c.name}: ${c.text}">
+    <span class="img"><img src="media/thumb_${c.slug}.jpg" alt="" loading="lazy" width="480" height="270"><span class="playing"${c === clip ? '' : ' hidden'}>Showing</span><span class="len">${fmt(c.dur)}</span></span>
+    <span class="name">${c.name}</span>
+  </button>`).join('');
+document.querySelectorAll('.thumb').forEach(b => b.addEventListener('click', () => setClip(CLIPS.find(c => c.slug === b.dataset.slug))));
+$('nowText').textContent = clip.text;
+fsIcon(); ui(); requestAnimationFrame(tick);
+
+// The 90 fps files only look right on a 90 Hz or faster screen, so pick by the refresh rate measured from
+// animation frames (median interval over ~1 s). The viewer can always switch.
 function note(){
   if (!measured) return;
   const h = Math.round(measured);
@@ -175,7 +418,6 @@ function note(){
     ? `Your screen runs at about <b>${h} Hz</b>${fps === 90 ? ', so you see all 90 frames a second.' : '. Try 90 fps.'}`
     : `Your screen runs at about <b>${h} Hz</b>${fps === 90 ? ': 90 fps needs a 90 Hz or faster screen, so 60 fps will look the same here.' : '. 90 fps needs a 90 Hz or faster screen.'}`;
 }
-btns.forEach(b => b.addEventListener('click', () => pick(+b.dataset.fps, true)));
 function measure(){
   const ts = [];
   function step(t){
@@ -184,13 +426,13 @@ function measure(){
     const d = ts.slice(1).map((x, i) => x - ts[i]).sort((a, b) => a - b);
     const med = d[d.length >> 1];
     measured = med > 0 ? 1000 / med : 60;
-    if (!fps) pick(measured >= 85 ? 90 : 60, false); else note();
+    if (!fps) setFps(measured >= 85 ? 90 : 60); else note();
   }
   requestAnimationFrame(step);
 }
 if (document.visibilityState === 'visible') measure();
 else document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && !measured) measure(); }, {once: true});
-setTimeout(() => { if (!fps) { pick(60, false); hz.textContent = '90 fps needs a 90 Hz or faster screen.'; } }, 3000);
+setTimeout(() => { if (!fps) { setFps(60); hz.textContent = '90 fps needs a 90 Hz or faster screen.'; } }, 3000);
 </script>
 </body>
 </html>
