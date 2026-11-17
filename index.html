@@ -15,7 +15,7 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@100..125,500..800&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@500;600&display=swap">
 <style>
 /* One screening column: the player (six clips, four views, 60 / 90 fps) with its clip gallery, then the slowed clip,
-   then what SmoovPlay is. A committed dark look, the trailer's own: blue-black ground, amber for SmoovPlay. */
+   then a live PS5 test (Gotham Knights, its own section, apart from the GTA VI clips), then what SmoovPlay is. A committed dark look, the trailer's own: blue-black ground, amber for SmoovPlay. */
 :root{
   --bg:#0b0d11; --panel:#12151b; --line:#232934; --fg:#f3f5f9; --fg2:#a9b1bf; --muted:#6f788a;
   --amber:#ffb02e; --ink:#1a1206;
@@ -200,6 +200,16 @@ footer p{margin:0}
     </div>
   </section>
 
+  <section class="live" aria-labelledby="live-h">
+    <div class="eyebrow">Live test · real PS5 play</div>
+    <h2 id="live-h">Gotham Knights over PS5 Remote Play</h2>
+    <p>A minute of real play, saved by SmoovPlay's instant replay as it happened, on an RTX 4070 Ti SUPER. Left of the line is the stream at 30 fps: the game runs faster than that on its own, so SmoovPlay's "Simulate a 30 fps game" test mode kept every other frame. Right of it is SmoovPlay at 90 fps, about 35&nbsp;ms behind the stream.</p>
+    <div class="screen">
+      <video controls muted playsinline preload="none" poster="media/live_gotham_knights.jpg" src="media/live_gotham_knights_90.mp4" aria-label="Gotham Knights played over PS5 Remote Play: the 30 fps stream left of the line, SmoovPlay at 90 fps right of it"></video>
+    </div>
+    <p>Recorded at 90 fps, with the game's sound (unmute it in the player). It's smoothest on a screen at 90 Hz or more: a 60 Hz screen can't show every frame.</p>
+  </section>
+
   <div class="about">
     <div>
       <p><strong>SmoovPlay</strong> plays your console on your PC and uses the graphics card to draw extra frames, so a 30 fps game runs at 60, 90 or up to 120 fps to match your screen.</p>
@@ -209,8 +219,9 @@ footer p{margin:0}
   </div>
 
   <footer>
-    <p>Clips: Rockstar Games' published GTA VI gameplay (An Extended Look), run through SmoovPlay as a simulated 1080p30 PS5 Remote Play stream. Demonstration only; nothing here is monetized. Grand Theft Auto VI © Rockstar Games.</p>
-    <p>SmoovPlay is an independent project, not affiliated with or endorsed by Rockstar Games, Sony, Microsoft, NVIDIA, AMD or Intel.</p>
+    <p>Clips above: Rockstar Games' published GTA VI gameplay (An Extended Look), run through SmoovPlay as a simulated 1080p30 PS5 Remote Play stream. Demonstration only; nothing here is monetized. Grand Theft Auto VI © Rockstar Games.</p>
+    <p>Live test: Gotham Knights, played by the SmoovPlay developer on their own PS5. Gotham Knights © Warner Bros. Games; Batgirl and all related characters © &amp; ™ DC.</p>
+    <p>SmoovPlay is an independent project, not affiliated with or endorsed by Rockstar Games, Warner Bros. Games, DC, Sony, Microsoft, NVIDIA, AMD or Intel.</p>
   </footer>
 </div>
 
@@ -394,7 +405,7 @@ document.addEventListener('webkitfullscreenchange', fsIcon);
 document.addEventListener('keydown', e => {
   if (e.ctrlKey || e.metaKey || e.altKey) return;
   const k = e.key.toLowerCase(), inField = e.target.tagName === 'INPUT' && e.target.type !== 'range';
-  if (inField) return;
+  if (inField || (e.target.tagName === 'VIDEO' && !stage.contains(e.target))) return;  // the slowed and live clips' own keys
   if (k === 't') { e.preventDefault(); setView(view === 'base' ? 'smooth' : 'base'); }
   else if (k === 'f') { e.preventDefault(); fullscreen(); }
   else if (k === 'k' || (k === ' ' && (e.target === document.body || e.target === stage))) { e.preventDefault(); toggle(); }
